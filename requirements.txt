@@ -1,0 +1,4 @@
+torch>=1.0
+onnx>=1.6
+opencv-python>=3.4
+numpy>=1.17
