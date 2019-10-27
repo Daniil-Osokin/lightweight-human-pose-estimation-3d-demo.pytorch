@@ -21,7 +21,7 @@ def rotate_poses(poses_3d, R, t):
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser(description='Lightweight 3d human pose estimation demo. '
+    parser = ArgumentParser(description='Lightweight 3D human pose estimation demo. '
                                         'Press esc to exit, "p" to (un)pause video or process next image.')
     parser.add_argument('-m', '--model',
                         help='Required. Path to checkpoint with a trained model '
@@ -58,7 +58,7 @@ if __name__ == '__main__':
 
     canvas_3d = np.zeros((720, 1280, 3), dtype=np.uint8)
     plotter = Plotter3d(canvas_3d.shape[:2])
-    canvas_3d_window_name = 'Canvas 3d'
+    canvas_3d_window_name = 'Canvas 3D'
     cv2.namedWindow(canvas_3d_window_name)
     cv2.setMouseCallback(canvas_3d_window_name, Plotter3d.mouse_callback)
 
@@ -117,7 +117,7 @@ if __name__ == '__main__':
             mean_time = mean_time * 0.95 + current_time * 0.05
         cv2.putText(frame, 'FPS: {}'.format(int(1 / mean_time * 10) / 10),
                     (40, 80), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255))
-        cv2.imshow('ICV 3d Human Pose Estimation', frame)
+        cv2.imshow('ICV 3D Human Pose Estimation', frame)
 
         key = cv2.waitKey(delay)
         if key == esc_code:
@@ -127,7 +127,7 @@ if __name__ == '__main__':
                 delay = 0
             else:
                 delay = 1
-        if delay == 0 or not is_video:  # allow to rotate 3d canvas while on pause
+        if delay == 0 or not is_video:  # allow to rotate 3D canvas while on pause
             key = 0
             while (key != p_code
                    and key != esc_code
