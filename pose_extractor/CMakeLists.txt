@@ -26,5 +26,7 @@ target_link_libraries(${target_name} ${PYTHON_LIBRARIES} ${OpenCV_LIBS})
 set_target_properties(${target_name} PROPERTIES PREFIX "" OUTPUT_NAME "${target_name}")
 if(WIN32)
     set_target_properties(${target_name} PROPERTIES SUFFIX ".pyd")
+elseif(APPLE)
+    set_target_properties(${target_name} PROPERTIES SUFFIX ".so")
 endif()
 
