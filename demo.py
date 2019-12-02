@@ -43,10 +43,20 @@ if __name__ == '__main__':
                         help='Optional. Path to file with camera extrinsics.',
                         type=str, default=None)
     parser.add_argument('--fx', type=np.float32, default=-1, help='Optional. Camera focal length.')
+    parser.add_argument('--outfile', type=str, help='Optional. Path to video file to write the visualized poses'
+                                                    'overlaying the original input', default=None)
     args = parser.parse_args()
 
     if args.video == '' and args.images == '':
         raise ValueError('Either --video or --image has to be provided')
+
+    video_writer = None
+    if args.outfile:
+        print(f"Output will be written to {args.outfile}")
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # appears to work fine when outfile is *.mp4
+        fps = 30  # TODO: read from input file
+        resolution = (1080*2, 720)  # this is hardcoded for now
+        video_writer = cv2.VideoWriter(args.outfile, fourcc, fps, resolution)
 
     stride = 8
     if args.use_openvino:
@@ -119,8 +129,19 @@ if __name__ == '__main__':
                     (40, 80), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255))
         cv2.imshow('ICV 3D Human Pose Estimation', frame)
 
+        # combine 2d + 3D frame
+        # print(frame.shape)
+        # print(canvas_3d.shape)
+
+        if video_writer:
+            combined = np.concatenate((frame, canvas_3d[:, 100:1180, :]), axis=1)
+            video_writer.write(combined)
+
         key = cv2.waitKey(delay)
         if key == esc_code:
+            if video_writer:
+                video_writer.release()
+                print(f"Finished writing out file to {args.outfile}")
             break
         if key == p_code:
             if delay == 1:
@@ -136,6 +157,13 @@ if __name__ == '__main__':
                 cv2.imshow(canvas_3d_window_name, canvas_3d)
                 key = cv2.waitKey(33)
             if key == esc_code:
+                if video_writer:
+                    video_writer.release()
+                    print(f"Finished writing out file to {args.outfile}")
                 break
             else:
                 delay = 1
+
+    if video_writer:
+        video_writer.release()
+        print(f"Finished writing out file to {args.outfile}")
