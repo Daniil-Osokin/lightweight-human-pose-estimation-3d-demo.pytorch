@@ -52,7 +52,7 @@ class VideoWriter:
     def release(self):
         if self.outfile and self.writer:
             self.writer.release()
-            self.outfile = None
+            self.writer = None
             print(f"Finished writing out file to {self.outfile}")
 
     def combine(self, frame_2d, frame_3d):
