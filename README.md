@@ -33,10 +33,6 @@ pip install -r requirements.txt
 ```
 python setup.py build_ext
 ```
-3. Add build folder to `PYTHONPATH`:
-```
-export PYTHONPATH=pose_extractor/build/:$PYTHONPATH
-```
 
 ## Pre-trained model <a name="pre-trained-model"/>
 

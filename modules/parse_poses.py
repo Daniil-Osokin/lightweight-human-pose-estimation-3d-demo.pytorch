@@ -2,6 +2,8 @@ import numpy as np
 
 from modules.pose import Pose, propagate_ids
 try:
+    import sys
+    sys.path.insert(0, "pose_extractor\\build")
     from pose_extractor import extract_poses
 except:
     print('#### Cannot load fast pose extraction, switched to legacy slow implementation. ####')
