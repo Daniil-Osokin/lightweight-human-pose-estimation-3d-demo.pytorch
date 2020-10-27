@@ -192,4 +192,3 @@ class PoseEstimationWithMobileNet(nn.Module):
         out = self.Pose3D(backbone_features, torch.cat([stages_output[-2], stages_output[-1]], dim=1))
 
         return out, keypoints2d_maps, paf_maps
-

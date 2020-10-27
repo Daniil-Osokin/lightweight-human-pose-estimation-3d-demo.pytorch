@@ -85,11 +85,14 @@ To run with TensorRT, it is necessary to install it properly. Please, follow the
     ```
 4. [Install](https://github.com/NVIDIA-AI-IOT/torch2trt) `torch2trt`.
 
-
 Convert checkpoint to TensorRT format:
 ```
 python scripts/convert_to_trt.py --checkpoint-path human-pose-estimation-3d.pth
 ```
+> TensorRT does not support dynamic network input size reshape.
+  Make sure you have set proper network input height, width with `--height` and `--width` options during conversion (if not, there will be no detections).
+  Default values work for a usual video with 16:9 aspect ratio (1280x720, 1920x1080).
+  You can check the network input size with `print(scaled_img.shape)` in the demo.py
 
 To run the demo with TensorRT inference, pass `--use-tensorrt` option:
 ```
