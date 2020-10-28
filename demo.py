@@ -37,6 +37,8 @@ if __name__ == '__main__':
                         help='Optional. Run network with OpenVINO as inference engine. '
                              'CPU, GPU, FPGA, HDDL or MYRIAD devices are supported.',
                         action='store_true')
+    parser.add_argument('--use-tensorrt', help='Optional. Run network with TensorRT as inference engine.',
+                        action='store_true')
     parser.add_argument('--images', help='Optional. Path to input image(s).', nargs='+', default='')
     parser.add_argument('--height-size', help='Optional. Network input layer height size.', type=int, default=256)
     parser.add_argument('--extrinsics-path',
@@ -54,7 +56,7 @@ if __name__ == '__main__':
         net = InferenceEngineOpenVINO(args.model, args.device)
     else:
         from modules.inference_engine_pytorch import InferenceEnginePyTorch
-        net = InferenceEnginePyTorch(args.model, args.device)
+        net = InferenceEnginePyTorch(args.model, args.device, use_tensorrt=args.use_tensorrt)
 
     canvas_3d = np.zeros((720, 1280, 3), dtype=np.uint8)
     plotter = Plotter3d(canvas_3d.shape[:2])

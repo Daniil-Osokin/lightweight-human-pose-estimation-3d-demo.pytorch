@@ -42,7 +42,7 @@ class InitialStage(nn.Module):
         trunk_features = self.trunk(x)
         heatmaps = self.heatmaps(trunk_features)
         pafs = self.pafs(trunk_features)
-        return [heatmaps, pafs]
+        return heatmaps, pafs
 
 
 class RefinementStageBlock(nn.Module):
@@ -83,7 +83,7 @@ class RefinementStage(nn.Module):
         trunk_features = self.trunk(x)
         heatmaps = self.heatmaps(trunk_features)
         pafs = self.pafs(trunk_features)
-        return [heatmaps, pafs]
+        return heatmaps, pafs
 
 
 class RefinementStageLight(nn.Module):
@@ -101,7 +101,7 @@ class RefinementStageLight(nn.Module):
     def forward(self, x):
         trunk_features = self.trunk(x)
         feature_maps = self.feature_maps(trunk_features)
-        return [feature_maps]
+        return feature_maps
 
 
 class ResBlock(nn.Module):
@@ -180,7 +180,7 @@ class PoseEstimationWithMobileNet(nn.Module):
         model_features = self.model(x)
         backbone_features = self.cpm(model_features)
 
-        stages_output = self.initial_stage(backbone_features)
+        stages_output = [*self.initial_stage(backbone_features)]
         for refinement_stage in self.refinement_stages:
             stages_output.extend(
                 refinement_stage(torch.cat([backbone_features, stages_output[-2], stages_output[-1]], dim=1)))
@@ -192,4 +192,3 @@ class PoseEstimationWithMobileNet(nn.Module):
         out = self.Pose3D(backbone_features, torch.cat([stages_output[-2], stages_output[-1]], dim=1))
 
         return out, keypoints2d_maps, paf_maps
-

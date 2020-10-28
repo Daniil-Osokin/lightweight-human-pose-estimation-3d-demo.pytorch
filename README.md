@@ -15,6 +15,7 @@ This repository contains 3D multi-person pose estimation demo in PyTorch. Intel 
 * [Pre-trained model](#pre-trained-model)
 * [Running](#running)
 * [Inference with OpenVINO](#inference-openvino)
+* [Inference with TensorRT](#inference-tensorrt)
 
 ## Requirements
 * Python 3.5 (or above)
@@ -23,6 +24,7 @@ This repository contains 3D multi-person pose estimation demo in PyTorch. Intel 
 * OpenCV 4.0 (or above)
 
 > [Optional] [Intel OpenVINO](https://software.intel.com/en-us/openvino-toolkit) for fast inference on CPU.
+> [Optional] [NVIDIA TensorRT](https://docs.nvidia.com/deeplearning/tensorrt/install-guide/index.html) for fast inference on Jetson.
 
 ## Prerequisites
 1. Install requirements:
@@ -70,3 +72,31 @@ To run the demo with OpenVINO inference, pass `--use-openvino` option and specif
 ```
 python demo.py --model human-pose-estimation-3d.xml --device CPU --use-openvino --video 0
 ```
+
+## Inference with TensorRT <a name="inference-tensorrt"/>
+
+To run with TensorRT, it is necessary to install it properly. Please, follow the [official guide](https://docs.nvidia.com/deeplearning/tensorrt/install-guide/index.html), these steps work for me:
+1. [Install](https://developer.nvidia.com/cuda-downloads) CUDA 11.1.
+2. [Install](https://developer.nvidia.com/cudnn) cuDNN 8 (runtime library, then developer).
+3. Install `nvidia-tensorrt`:
+    ```
+    python -m pip install nvidia-pyindex
+    pip install nvidia-tensorrt==7.2.1.6
+    ```
+4. [Install](https://github.com/NVIDIA-AI-IOT/torch2trt) `torch2trt`.
+
+Convert checkpoint to TensorRT format:
+```
+python scripts/convert_to_trt.py --checkpoint-path human-pose-estimation-3d.pth
+```
+> TensorRT does not support dynamic network input size reshape.
+  Make sure you have set proper network input height, width with `--height` and `--width` options during conversion (if not, there will be no detections).
+  Default values work for a usual video with 16:9 aspect ratio (1280x720, 1920x1080).
+  You can check the network input size with `print(scaled_img.shape)` in the demo.py
+
+To run the demo with TensorRT inference, pass `--use-tensorrt` option:
+```
+python demo.py --model human-pose-estimation-3d-trt.pth --use-tensorrt --video 0
+```
+
+I have observed ~10x network inference speedup on RTX 2060 (in comparison with default PyTorch 1.6.0+cu101 inference).

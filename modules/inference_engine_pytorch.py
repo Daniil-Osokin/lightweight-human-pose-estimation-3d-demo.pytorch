@@ -5,7 +5,8 @@ import torch
 class InferenceEnginePyTorch:
     def __init__(self, checkpoint_path, device,
                  img_mean=np.array([128, 128, 128], dtype=np.float32),
-                 img_scale=np.float32(1/255)):
+                 img_scale=np.float32(1/255),
+                 use_tensorrt=False):
         from models.with_mobilenet import PoseEstimationWithMobileNet
         from modules.load_state import load_state
         self.img_mean = img_mean
@@ -19,8 +20,13 @@ class InferenceEnginePyTorch:
 
         net = PoseEstimationWithMobileNet()
         checkpoint = torch.load(checkpoint_path, map_location='cpu')
-        load_state(net, checkpoint)
-        net = net.to(self.device)
+        if use_tensorrt:
+            from torch2trt import TRTModule
+            net = TRTModule()
+            net.load_state_dict(checkpoint)
+        else:
+            load_state(net, checkpoint)
+            net = net.to(self.device)
         net.eval()
         self.net = net
 
