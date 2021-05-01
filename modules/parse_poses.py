@@ -33,11 +33,11 @@ def get_root_relative_poses(inference_results):
     num_kpt_panoptic = 19
     num_kpt = 18
     for pose_id in range(found_poses.shape[0]):
-        if found_poses[pose_id, 3] == -1:  # skip pose if does not found neck
+        if found_poses[pose_id, 5] == -1:  # skip pose if is not found neck
             continue
         pose_2d = np.ones(num_kpt_panoptic * 3 + 1, dtype=np.float32) * -1  # +1 for pose confidence
         for kpt_id in range(num_kpt):
-            if found_poses[pose_id, kpt_id * 3] != -1:
+            if found_poses[pose_id, kpt_id * 3 + 2] != -1:
                 x_2d, y_2d = found_poses[pose_id, kpt_id * 3:kpt_id * 3 + 2]
                 conf = found_poses[pose_id, kpt_id * 3 + 2]
                 pose_2d[map_id_to_panoptic[kpt_id] * 3] = x_2d  # just repacking
@@ -85,7 +85,7 @@ def parse_poses(inference_results, input_scale, stride, fx, is_video=False):
         num_kpt = (pose_2d.shape[0] - 1) // 3
         pose_2d_scaled = np.ones(pose_2d.shape[0], dtype=np.float32) * -1  # +1 for pose confidence
         for kpt_id in range(num_kpt):
-            if pose_2d[kpt_id * 3] != -1:
+            if pose_2d[kpt_id * 3 + 2] != -1:
                 pose_2d_scaled[kpt_id * 3] = int(pose_2d[kpt_id * 3] * stride / input_scale)
                 pose_2d_scaled[kpt_id * 3 + 1] = int(pose_2d[kpt_id * 3 + 1] * stride / input_scale)
                 pose_2d_scaled[kpt_id * 3 + 2] = pose_2d[kpt_id * 3 + 2]
@@ -97,7 +97,7 @@ def parse_poses(inference_results, input_scale, stride, fx, is_video=False):
         for pose_id in range(len(poses_2d_scaled)):
             pose_keypoints = np.ones((Pose.num_kpts, 2), dtype=np.int32) * -1
             for kpt_id in range(Pose.num_kpts):
-                if poses_2d_scaled[pose_id][kpt_id * 3] != -1.0:  # keypoint was found
+                if poses_2d_scaled[pose_id][kpt_id * 3 + 2] != -1.0:  # keypoint is found
                     pose_keypoints[kpt_id, 0] = int(poses_2d_scaled[pose_id][kpt_id * 3 + 0])
                     pose_keypoints[kpt_id, 1] = int(poses_2d_scaled[pose_id][kpt_id * 3 + 1])
             pose = Pose(pose_keypoints, poses_2d_scaled[pose_id][-1])
